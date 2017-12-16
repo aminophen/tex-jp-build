@@ -403,6 +403,8 @@ In \pTeX\ the |subtype| field records the box direction |box_dir|.
 @d space_offset = 7 {position of |glue_set| in a box node}
 @d space_ptr(#) == link(#+space_offset)
 @d xspace_ptr(#) == info(#+space_offset)
+@#
+@d parindent_box = min_quarterword+1 { box from \.{\\parindent} }
 @z
 
 @x [10.136] l.3037 - pTeX: space_ptr, xspace_ptr
@@ -5103,6 +5105,13 @@ push_nest; adjust_dir:=direction;
 mode:=hmode; space_factor:=1000; set_cur_lang; clang:=cur_lang;
 @z
 
+@x pTeX: new_graf, indented_box
+  begin tail:=new_null_box; link(head):=tail; width(tail):=par_indent;
+@y
+  begin tail:=new_null_box; link(head):=tail; width(tail):=par_indent;
+  subtype(tail):=parindent_box;
+@z
+
 @x [47.1096] l.21155 - pTeX: end_graf, call adjust_hlist
   begin if head=tail then pop_nest {null paragraphs are ignored}
   else line_break(widow_penalty);
@@ -7123,13 +7132,18 @@ else
 end;
 
 @ @<Append |disp_node| at end ...@>=
-if disp<>0 then
-begin if not is_char_node(tail)and(type(tail)=disp_node) then
-  begin disp_dimen(tail):=0;
-  end
-else
-  begin prev_node:=tail; tail_append(get_node(small_node_size));
-  type(tail):=disp_node; disp_dimen(tail):=0; prev_disp:=disp;
+if (head<>tail) then begin
+  if is_char_node(tail) 
+    or (type(tail)<>hlist_node)or(subtype(tail)<>parindent_box) then
+  begin if disp<>0 then
+    begin if not is_char_node(tail)and(type(tail)=disp_node) then
+      begin disp_dimen(tail):=0;
+      end
+    else
+      begin prev_node:=tail; tail_append(get_node(small_node_size));
+      type(tail):=disp_node; disp_dimen(tail):=0; prev_disp:=disp;
+      end;
+    end;
   end;
 end;
 
