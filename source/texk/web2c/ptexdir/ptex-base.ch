@@ -7150,7 +7150,9 @@ end;
 @ @<Look ahead for glue or kerning@>=
 cur_q:=tail;
 if inhibit_glue_flag<>true then
-  begin if char_tag(main_i)=gk_tag then
+  begin if (not is_char_node(tail))and(type(tail)=hlist_node)and(subtype(tail)=parindent_box) then
+    goto skip_loop
+  else begin if char_tag(main_i)=gk_tag then
     begin main_k:=glue_kern_start(main_f)(main_i);
     repeat main_j:=font_info[main_k].qqqq;
     if next_char(main_j)=cur_l then
@@ -7184,6 +7186,7 @@ if inhibit_glue_flag<>true then
     end;
   incr(main_k);
   until skip_byte(main_j)>=stop_flag;
+  end;
   end;
 end;
 skip_loop: inhibit_glue_flag:=false;
