@@ -1,0 +1,28 @@
+\ybaselineshift10pt
+\tracingonline1
+\showboxdepth10000
+\showboxbreadth10000
+
+\setbox0=\hbox{a}
+\leavevmode
+a\char230感
+\showlists
+\end
+
+
+
+\setbox0\hbox{あa}
+
+\ybaselineshift-10pt
+
+\setbox1\hbox{Bい}
+
+\ybaselineshift3pt
+\leavevmode
+\setbox3\hbox{\unhcopy0\unhcopy0. \unhcopy0 \unhcopy1 }\showbox3
+\setbox3\hbox{\unhcopy1\unhcopy0. \unhcopy1 \unhcopy1 }\showbox3
+
+
+\showbox0
+\showbox1
+

@@ -1,0 +1,39 @@
+\tracingonline1
+\showboxdepth10000
+\showboxbreadth10000
+
+\def\ADJUST{\ybaselineshift3pt\relax}
+
+% こちらの挙動が問題；disp_node が原因で頭の JFM グルーが残る
+\setbox0=\vbox{%
+\ADJUST
+\noindent CあA\par   % 先頭が disp_node → JFM グルーが残る
+\noindent 「あA\par   % 先頭が disp_node → JFM グルーが残る
+\noindent 「あA」\par % ここも先頭が disp_node → JFM グルーが残る
+\noindent 「あA\par   % 直前の段落が和文で終わっているので先頭が disp_node でない
+\noindent いEお}\showbox0 \box0
+
+% 今回とは無関係
+\setbox2=\vbox{%
+\ADJUST
+「あA\par   % 先頭が \hbox(0.0+0.0)x20.0 → JFM グルーが残る
+「あA」\par % 同様
+「あA\par   % 同様
+CあA\par
+いEお}\showbox2 \box2
+
+% こちらも今回とは無関係
+\parindent0pt
+\setbox4=\vbox{%
+\ADJUST
+「あA\par % \parindent 由来の \hbox(0.0+0.0)x0.0 が JFM グルー非消滅の原因
+「あA」\par % 同様
+「あA\par   % 同様
+いEお\par}\showbox4 \box4
+
+\setbox6\hbox{\ADJUST
+  あA\hbox{（あ）E}A
+}
+\showbox6 \box6
+\end
+

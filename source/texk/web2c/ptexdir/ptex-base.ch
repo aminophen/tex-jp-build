@@ -404,6 +404,8 @@ In \pTeX\ the |subtype| field records the box direction |box_dir|.
 @d space_ptr(#) == link(#+space_offset)
 @d xspace_ptr(#) == info(#+space_offset)
 @#
+@ \pTeX\ needs to distinct a horizontal box by \.{\\parindent} from
+other horizontal boxes. Hence a new subtype |parindent_box| is introduced.
 @d parindent_box = min_quarterword+1 { box from \.{\\parindent} }
 @z
 
