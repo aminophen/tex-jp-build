@@ -1,13 +1,23 @@
-\documentclass{tarticle}
-\def\V{\smash{\kern-.2pt\vrule height 100pt\kern-.2pt}}
+\documentclass{jarticle}
+\def\V{\smash{\kern-.2pt\vrule height 200pt\kern-.2pt}}
+\def\A#1{\noindent\texttt{\textbackslash #1}\par\csname#1\endcsname}
 \tracingonline1
 \showboxbreadth10000
 \showboxdepth10000
 \begin{document}
-\begin{quote}
-\noindent 「あいうえお」\showlists\par
-\noindent 「あいうえお」\par
-\noindent あ\V い\V う\V え\V お
-\end{quote}
+%\begin{quote}
+\noindent DEFAULT\par
+「あいうえお」\\
+「あいうえお」\par
+
+\A{beginparspacing}
+「あいうえお」\\
+「あいうえお」\par
+
+\A{nobeginparspacing}
+「あいうえお」\\
+「あいうえお」\par
+あ\V い\V う\V え\V お
+%\end{quote}
 \end{document}
 

@@ -1114,7 +1114,8 @@ primitive("xkanjiskip",assign_glue,glue_base+xkanji_skip_code);@/
 @d cur_tfont_loc=cur_jfont_loc+1
 @d auto_spacing_code=cur_tfont_loc+1
 @d auto_xspacing_code=auto_spacing_code+1
-@d cat_code_base=auto_xspacing_code+1
+@d beginpar_spacing_code=auto_xspacing_code+1
+@d cat_code_base=beginpar_spacing_code+1
   {table of 256 command codes (the ``catcodes'')}
 @d kcat_code_base=cat_code_base+256
   {table of 256 command codes for the wchar's catcodes }
@@ -1136,6 +1137,7 @@ primitive("xkanjiskip",assign_glue,glue_base+xkanji_skip_code);@/
 @d cur_tfont==equiv(cur_tfont_loc)
 @d auto_spacing==equiv(auto_spacing_code)
 @d auto_xspacing==equiv(auto_xspacing_code)
+@d beginpar_spacing==equiv(beginpar_spacing_code)
 @d kcat_code(#)==equiv(kcat_code_base+#)
 @d auto_xsp_code(#)==equiv(auto_xsp_code_base+#)
 @d inhibit_xsp_type(#)==eq_type(inhibit_xsp_code_base+#)
@@ -5002,6 +5004,7 @@ tail:=p; link(p):=null;
 done:end
 @y
 begin fetch_effective_tail(goto done);
+subtype(tx):=min_quarterword;
 cur_box:=tx; shift_amount(cur_box):=0;
 if type(cur_box)=dir_node then
   begin link(list_ptr(cur_box)):=cur_box;
@@ -6276,6 +6279,8 @@ used to control between 2byte and 1byte characters.
 @d set_auto_spacing_code=1
 @d reset_auto_xspacing_code=2
 @d set_auto_xspacing_code=3
+@d reset_beginpar_spacing_code=4
+@d set_beginpar_spacing_code=5
 
 @<Put each...@>=
 primitive("autospacing",set_auto_spacing,set_auto_spacing_code);
@@ -6286,17 +6291,23 @@ primitive("autoxspacing",set_auto_spacing,set_auto_xspacing_code);
 @!@:auto_xspacing_}{\.{\\autoxspacing} primitive@>
 primitive("noautoxspacing",set_auto_spacing,reset_auto_xspacing_code);
 @!@:no_auto_xspacing_}{\.{\\noautoxspacing} primitive@>
+primitive("beginparspacing",set_auto_spacing,set_beginpar_spacing_code);
+@!@:beginpar_spacing_}{\.{\\beginparspacing} primitive@>
+primitive("nobeginparspacing",set_auto_spacing,reset_beginpar_spacing_code);
+@!@:no_beginpar_spacing_}{\.{\\nobeginparspacing} primitive@>
 
 @ @<Cases of |print_cmd_chr|...@>=
 set_auto_spacing:begin
-  if (chr_code mod 2)=0 then print_esc("noauto") else print_esc("auto");
-  if chr_code<2 then print("spacing") else print("xspacing");
+  if (chr_code mod 2)=0 then print_esc("no") else print_esc("");
+  if chr_code>=4 then print("beginparspacing")
+  else if chr_code>=2 then  print("autoxspacing") else print("autospacing");
 end;
 
 @ @<Assignments@>=
 set_auto_spacing:begin
   if cur_chr<2 then p:=auto_spacing_code
-  else begin p:=auto_xspacing_code; cur_chr:=(cur_chr mod 2); end;
+  else if cur_chr<4 then begin p:=auto_xspacing_code; cur_chr:=(cur_chr mod 2); end
+  else begin p:=beginpar_spacing_code; cur_chr:=(cur_chr mod 2); end;
   define(p,data,cur_chr);
 end;
 
@@ -6309,6 +6320,9 @@ if auto_spacing>0 then print("auto spacing mode; ")
 print_nl("> ");
 if auto_xspacing>0 then print("auto xspacing mode")
   else print("no auto xspacing mode");
+print_nl("> ");
+if beginpar_spacing>0 then print("beginpar spacing mode")
+  else print("no beginpar spacing mode");
 goto common_ending;
 end
 
@@ -7135,7 +7149,7 @@ end;
 
 @ @<Append |disp_node| at end ...@>=
 if (head<>tail) then begin
-  if is_char_node(tail) 
+  if (is_char_node(tail))
     or (type(tail)<>hlist_node)or(subtype(tail)<>parindent_box) then
   begin if disp<>0 then
     begin if not is_char_node(tail)and(type(tail)=disp_node) then
@@ -7152,7 +7166,8 @@ end;
 @ @<Look ahead for glue or kerning@>=
 cur_q:=tail;
 if inhibit_glue_flag<>true then
-  begin if (not is_char_node(tail))and(type(tail)=hlist_node)and(subtype(tail)=parindent_box) then
+  begin if (beginpar_spacing>0)and(not is_char_node(tail))
+    and(type(tail)=hlist_node)and(subtype(tail)=parindent_box) then
     goto skip_loop
   else begin if char_tag(main_i)=gk_tag then
     begin main_k:=glue_kern_start(main_f)(main_i);

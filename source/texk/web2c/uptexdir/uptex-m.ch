@@ -193,13 +193,13 @@ if (kcode_pos=1)or((kcode_pos>=@'11)and(kcode_pos<=@'12))
 @z
 
 @x
-@d cat_code_base=auto_xspacing_code+1
+@d cat_code_base=beginpar_spacing_code+1
   {table of 256 command codes (the ``catcodes'')}
 @d kcat_code_base=cat_code_base+256
   {table of 256 command codes for the wchar's catcodes }
 @d auto_xsp_code_base=kcat_code_base+256 {table of 256 auto spacer flag}
 @y
-@d enable_cjk_token_code=auto_xspacing_code+1
+@d enable_cjk_token_code=beginpar_spacing_code+1
 @d cat_code_base=enable_cjk_token_code+1
   {table of 256 command codes (the ``catcodes'')}
 @d kcat_code_base=cat_code_base+256
@@ -1067,12 +1067,10 @@ primitive("forcecjktoken",set_enable_cjk_token,set_force_cjk_token_code);
 @z
 
 @x
-  if (chr_code mod 2)=0 then print_esc("noauto") else print_esc("auto");
-  if chr_code<2 then print("spacing") else print("xspacing");
+  else if chr_code>=2 then  print("autoxspacing") else print("autospacing");
 end;
 @y
-  if (chr_code mod 2)=0 then print_esc("noauto") else print_esc("auto");
-  if chr_code<2 then print("spacing") else print("xspacing");
+  else if chr_code>=2 then  print("autoxspacing") else print("autospacing");
 end;
 set_enable_cjk_token:begin
   if chr_code=0 then print_esc("enable")
@@ -1082,11 +1080,11 @@ end;
 @z
 
 @x
-  else begin p:=auto_xspacing_code; cur_chr:=(cur_chr mod 2); end;
+  else begin p:=beginpar_spacing_code; cur_chr:=(cur_chr mod 2); end;
   define(p,data,cur_chr);
 end;
 @y
-  else begin p:=auto_xspacing_code; cur_chr:=(cur_chr mod 2); end;
+  else begin p:=beginpar_spacing_code; cur_chr:=(cur_chr mod 2); end;
   define(p,data,cur_chr);
 end;
 set_enable_cjk_token: define(enable_cjk_token_code,data,cur_chr);
